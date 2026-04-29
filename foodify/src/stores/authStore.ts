@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { api } from '../api/api';
 
 interface User {
   id: number;
@@ -31,19 +32,8 @@ export const useAuthStore = create<AuthState>()(
       login: async (email: string, password: string) => {
         set({ isLoading: true });
         try {
-          const response = await fetch('http://localhost:3000/auth/login', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Login failed');
-          }
+          const response = await api.post('/auth/login', { email, password });
+          const data = response.data;
 
           set({
             user: data.data.user,
@@ -51,28 +41,17 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({ isLoading: false });
-          throw error;
+          throw new Error(error.response?.data?.error || 'Login failed');
         }
       },
 
       register: async (name: string, email: string, password: string, role: string) => {
         set({ isLoading: true });
         try {
-          const response = await fetch('http://localhost:3000/auth/register', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ name, email, password, role }),
-          });
-
-          const data = await response.json();
-
-          if (!response.ok) {
-            throw new Error(data.error || 'Registration failed');
-          }
+          const response = await api.post('/auth/register', { name, email, password, role });
+          const data = response.data;
 
           set({
             user: data.data.user,
@@ -80,9 +59,9 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
-        } catch (error) {
+        } catch (error: any) {
           set({ isLoading: false });
-          throw error;
+          throw new Error(error.response?.data?.error || 'Registration failed');
         }
       },
 

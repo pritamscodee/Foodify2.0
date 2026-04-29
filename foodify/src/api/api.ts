@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 export const api = axios.create({
-  baseURL:'https://express4foodify.onrender.com' 
+  baseURL: 'https://express4foodify.onrender.com',
 });
 
 api.interceptors.request.use(
