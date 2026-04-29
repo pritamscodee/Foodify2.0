@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { RouterProvider } from 'react-router-dom';
+import { RouterProvider, Navigate } from 'react-router-dom';
 
 import './index.css';
 import { createBrowserRouter } from 'react-router-dom';
 
-import RoleSelection from './components/RoleSelection';
 import Layout from './components/Buyer/LayoutPage';
 import FoodsCard from './components/Buyer/FoodsCard';
 import FoodsDeatils from './components/Buyer/FoodsDeatils';
@@ -22,7 +21,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <RoleSelection />,
+    element: <Navigate to='/login' replace />,
   },
   {
     path: '/login',
@@ -35,7 +34,7 @@ export const router = createBrowserRouter([
   {
     path: 'buyer',
     element: (
-      <ProtectedRoute requiredRole='user'>
+      <ProtectedRoute>
         <Layout />
       </ProtectedRoute>
     ),
@@ -61,7 +60,7 @@ export const router = createBrowserRouter([
   {
     path: 'seller',
     element: (
-      <ProtectedRoute requiredRole='seller'>
+      <ProtectedRoute>
         <SellerLayout />
       </ProtectedRoute>
     ),

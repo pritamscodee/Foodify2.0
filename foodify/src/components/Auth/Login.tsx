@@ -29,7 +29,12 @@ const Login = () => {
 
     try {
       await login(email, password);
-      navigate('/buyer/foods');
+      const { user } = useAuthStore.getState();
+      if (user?.role === 'seller') {
+        navigate('/seller/dashboard');
+      } else {
+        navigate('/buyer/foods');
+      }
     } catch (err: any) {
       setError(err.message || 'Login failed');
     } finally {

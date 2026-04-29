@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { Select } from '../ui/select';
 import {
   Card,
   CardContent,
@@ -43,18 +42,11 @@ const Register = () => {
     setIsLoading(true);
 
     try {
-      const result = await register(name, email, password, role);
-
-      if (result.navigationUrl) {
-        navigate(result.navigationUrl);
+      await register(name, email, password, role);
+      if (role === 'seller') {
+        navigate('/seller/dashboard');
       } else {
-        switch (role) {
-          case 'seller':
-            navigate('/seller/dashboard');
-            break;
-          default:
-            navigate('/buyer/foods');
-        }
+        navigate('/buyer/foods');
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed');
@@ -118,10 +110,15 @@ const Register = () => {
             </div>
             <div className='space-y-2'>
               <Label htmlFor='role'>Register as</Label>
-              <Select id='role' value={role} onChange={setRole} required>
+              <select
+                id='role'
+                value={role}
+                onChange={e => setRole(e.target.value)}
+                className='flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+              >
                 <option value='user'>Buyer</option>
                 <option value='seller'>Seller</option>
-              </Select>
+              </select>
             </div>
             {error && (
               <Alert variant='destructive'>

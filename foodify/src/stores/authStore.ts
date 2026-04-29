@@ -14,22 +14,15 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (
-    name: string,
-    email: string,
-    password: string,
-    role: string
-  ) => Promise<{ navigationUrl?: string }>;
+  register: (name: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
   setToken: (token: string) => void;
   clearAuth: () => void;
-  updateUserRole: (role: string) => void;
-  syncUserRoleFromRoute: (pathname: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       token: null,
       isAuthenticated: false,
@@ -64,12 +57,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      register: async (
-        name: string,
-        email: string,
-        password: string,
-        role: string
-      ) => {
+      register: async (name: string, email: string, password: string, role: string) => {
         set({ isLoading: true });
         try {
           const response = await fetch('http://localhost:3000/auth/register', {
@@ -92,10 +80,6 @@ export const useAuthStore = create<AuthState>()(
             isAuthenticated: true,
             isLoading: false,
           });
-
-          return {
-            navigationUrl: data.data.navigationUrl,
-          };
         } catch (error) {
           set({ isLoading: false });
           throw error;
@@ -121,39 +105,6 @@ export const useAuthStore = create<AuthState>()(
           token: null,
           isAuthenticated: false,
         });
-      },
-
-      updateUserRole: (role: string) => {
-        const currentUser = get().user;
-        if (currentUser) {
-          set({
-            user: {
-              ...currentUser,
-              role,
-            },
-          });
-        }
-      },
-
-      syncUserRoleFromRoute: (pathname: string) => {
-        const currentUser = get().user;
-        if (!currentUser) return;
-
-        let expectedRole = 'user';
-        if (pathname.startsWith('/seller')) {
-          expectedRole = 'seller';
-        } else if (pathname.startsWith('/buyer')) {
-          expectedRole = 'user';
-        }
-
-        if (currentUser.role !== expectedRole) {
-          set({
-            user: {
-              ...currentUser,
-              role: expectedRole,
-            },
-          });
-        }
       },
     }),
     {
